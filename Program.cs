@@ -5,27 +5,11 @@ await using var ctx = new BlogContext();
 await ctx.Database.EnsureDeletedAsync();
 await ctx.Database.EnsureCreatedAsync();
 
-for (var i = 0; i < 4; i++)
+ctx.Blogs.Add(new Blog
 {
-    ctx.Blogs.Add(new Blog
-    {
-        Name = "MyBlog" + i
-    });
-}
+    Name = "MyBlog"
+});
 await ctx.SaveChangesAsync();
-
-await foreach (var blog in ctx.Blogs)
-{
-    ctx.Remove(blog);
-}
-await ctx.SaveChangesAsync();
-
-await ctx.Blogs.ExecuteDeleteAsync();
-
-await ctx.Blogs
-    .ExecuteUpdateAsync(setters => setters
-        .SetProperty(b => b.Name, "bar")
-        .SetProperty(b => b.Rating, b => b.Rating + 1));
 
 public class BlogContext : DbContext
 {
@@ -44,7 +28,6 @@ public class BlogContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Blog>().Property(b => b.Id).UseHiLo();
     }
 }
 
